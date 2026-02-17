@@ -209,134 +209,23 @@
     <section class="py-20 bg-base-100">
       <div class="max-w-7xl mx-auto px-6">
         <!-- Section Title -->
-        <h2 class="text-3xl font-bold mb-10">Trending Now</h2>
+        <div class="flex justify-between items-center mb-10">
+          <h2 class="text-3xl font-bold">Trending Now</h2>
+          <a href="products.html" class="btn btn-outline btn-sm">View All Products</a>
+        </div>
 
         <!-- Product Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Product 1 -->
-          <div
-            class="card bg-base-200 shadow-md hover:shadow-xl transition duration-300"
-          >
-            <figure class="bg-gray-100 p-6">
-              <img
-                src="https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
-                alt="Backpack"
-                class="h-64 object-contain"
-              />
-            </figure>
-
-            <div class="card-body">
-              <!-- Category + Rating -->
-              <div class="flex justify-between items-center text-sm mb-2">
-                <span class="badge badge-primary badge-outline">
-                  Men's Clothing
-                </span>
-                <div class="flex items-center gap-1 text-yellow-500">
-                  <i class="fa-solid fa-star text-xs"></i>
-                  <span class="text-gray-600">3.9 (120)</span>
-                </div>
-              </div>
-
-              <!-- Title -->
-              <h3 class="font-semibold text-lg">
-                Fjallraven - Foldsack No. 1 Backpack
-              </h3>
-
-              <!-- Price -->
-              <p class="font-bold text-xl">$109.95</p>
-
-              <!-- Buttons -->
-              <div class="flex gap-3 mt-4">
-                <button class="btn btn-outline btn-sm flex-1">
-                  <i class="fa-regular fa-eye mr-1"></i> Details
-                </button>
-                <button class="btn btn-primary btn-sm flex-1">
-                  <i class="fa-solid fa-cart-plus mr-1"></i> Add
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Product 2 -->
-          <div
-            class="card bg-base-200 shadow-md hover:shadow-xl transition duration-300"
-          >
-            <figure class="bg-gray-100 p-6">
-              <img
-                src="https://fakestoreapi.com/img/71-3HjGNDUL._AC_UL640_QL65_ML3_.jpg"
-                alt="T-Shirt"
-                class="h-64 object-contain"
-              />
-            </figure>
-
-            <div class="card-body">
-              <div class="flex justify-between items-center text-sm mb-2">
-                <span class="badge badge-primary badge-outline">
-                  Men's Clothing
-                </span>
-                <div class="flex items-center gap-1 text-yellow-500">
-                  <i class="fa-solid fa-star text-xs"></i>
-                  <span class="text-gray-600">4.1 (259)</span>
-                </div>
-              </div>
-
-              <h3 class="font-semibold text-lg">
-                Mens Casual Premium Slim Fit T-Shirts
-              </h3>
-
-              <p class="font-bold text-xl">$22.3</p>
-
-              <div class="flex gap-3 mt-4">
-                <button class="btn btn-outline btn-sm flex-1">
-                  <i class="fa-regular fa-eye mr-1"></i> Details
-                </button>
-                <button class="btn btn-primary btn-sm flex-1">
-                  <i class="fa-solid fa-cart-plus mr-1"></i> Add
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Product 3 -->
-          <div
-            class="card bg-base-200 shadow-md hover:shadow-xl transition duration-300"
-          >
-            <figure class="bg-gray-100 p-6">
-              <img
-                src="https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg"
-                alt="Jacket"
-                class="h-64 object-contain"
-              />
-            </figure>
-
-            <div class="card-body">
-              <div class="flex justify-between items-center text-sm mb-2">
-                <span class="badge badge-primary badge-outline">
-                  Men's Clothing
-                </span>
-                <div class="flex items-center gap-1 text-yellow-500">
-                  <i class="fa-solid fa-star text-xs"></i>
-                  <span class="text-gray-600">4.7 (500)</span>
-                </div>
-              </div>
-
-              <h3 class="font-semibold text-lg">Mens Cotton Jacket</h3>
-
-              <p class="font-bold text-xl">$55.99</p>
-
-              <div class="flex gap-3 mt-4">
-                <button class="btn btn-outline btn-sm flex-1">
-                  <i class="fa-regular fa-eye mr-1"></i> Details
-                </button>
-                <button class="btn btn-primary btn-sm flex-1">
-                  <i class="fa-solid fa-cart-plus mr-1"></i> Add
-                </button>
-              </div>
-            </div>
+        <div id="trendingGrid" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 product-grid">
+          <!-- Loading spinner -->
+          <div class="col-span-full flex justify-center items-center py-12">
+            <div class="loading loading-spinner loading-lg text-primary"></div>
+            <span class="ml-3 text-gray-600">Loading trending products...</span>
           </div>
         </div>
       </div>
     </section>
+
+
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-gray-300 pt-16 pb-8">
