@@ -29,16 +29,16 @@
     <div class="navbar bg-base-100 shadow-sm px-4 lg:px-8">
       <!-- Left: Logo -->
       <div class="navbar-start">
-        <a class="text-xl font-bold text-indigo-600"> SwiftCart </a>
+        <a class="text-xl font-bold text-indigo-600" href="index.html"> SwiftCart </a>
       </div>
 
       <!-- Desktop Menu -->
       <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
-          <li><a>Home</a></li>
-          <li><a>Products</a></li>
-          <li><a>About</a></li>
-          <li><a>Contact</a></li>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
         </ul>
       </div>
 
@@ -91,57 +91,18 @@
 
         <!-- Category Filter -->
         <div class="flex flex-wrap justify-center gap-3 mb-10">
-          <button class="btn btn-sm btn-primary rounded-full">All</button>
-          <button class="btn btn-sm rounded-full">Electronics</button>
-          <button class="btn btn-sm rounded-full">Jewelry</button>
-          <button class="btn btn-sm rounded-full">Men's Clothing</button>
-          <button class="btn btn-sm rounded-full">Women's Clothing</button>
+          <!-- Categories will be loaded dynamically -->
+          <div class="loading loading-spinner loading-sm text-primary"></div>
+          <span class="text-gray-500 text-sm">Loading categories...</span>
         </div>
 
         <!-- Product Grid -->
         <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          <!-- Product Card -->
-
-          <div
-            class="card bg-base-200 shadow-md hover:shadow-xl transition duration-300"
-          >
-            <figure class="bg-gray-100 p-6">
-              <img
-                src="https://fakestoreapi.com/img/71-3HjGNDUL._AC_UL640_QL65_ML3_.jpg"
-                alt="T-Shirt"
-                class="h-64 object-contain"
-              />
-            </figure>
-
-            <div class="card-body">
-              <div class="flex justify-between items-center text-sm mb-2">
-                <span class="badge badge-primary badge-outline">
-                  Men's Clothing
-                </span>
-                <div class="flex items-center gap-1 text-yellow-500">
-                  <i class="fa-solid fa-star text-xs"></i>
-                  <span class="text-gray-600">4.1 (259)</span>
-                </div>
-              </div>
-
-              <h3 class="font-semibold text-lg">
-                Mens Casual Premium Slim Fit T-Shirts
-              </h3>
-
-              <p class="font-bold text-xl">$22.3</p>
-
-              <div class="flex gap-3 mt-4">
-                <button class="btn btn-outline btn-sm flex-1">
-                  <i class="fa-regular fa-eye mr-1"></i> Details
-                </button>
-                <button class="btn btn-primary btn-sm flex-1">
-                  <i class="fa-solid fa-cart-plus mr-1"></i> Add
-                </button>
-              </div>
-            </div>
+          <!-- Loading spinner -->
+          <div class="col-span-full flex justify-center items-center py-12">
+            <div class="loading loading-spinner loading-lg text-primary"></div>
+            <span class="ml-3 text-gray-600">Loading products...</span>
           </div>
-
-          <!-- Copy & duplicate product cards below -->
         </div>
       </div>
     </section>
@@ -169,10 +130,10 @@
             </h4>
             <ul class="space-y-2 text-sm">
               <li>
-                <a href="#" class="hover:text-indigo-400 transition">Home</a>
+                <a href="index.html" class="hover:text-indigo-400 transition">Home</a>
               </li>
               <li>
-                <a href="#" class="hover:text-indigo-400 transition"
+                <a href="products.html" class="hover:text-indigo-400 transition"
                   >Products</a
                 >
               </li>
