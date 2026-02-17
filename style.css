@@ -39,3 +39,68 @@
   align-items: center;
   gap: 0.75rem;
 }
+
+/* Skeleton loading animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Enhanced skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Cart badge positioning */
+.cart-button {
+  position: relative;
+}
+
+/* Loading spinner improvements */
+.loading-spinner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Smooth transitions for cart updates */
+.cart-update-animation {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Product card loading state */
+.product-card-loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Enhanced error states */
+.error-retry-button {
+  animation: pulse 2s infinite;
+}

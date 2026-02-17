@@ -12,8 +12,281 @@ const productsGrid = document.querySelector('.product-grid');
 const categoryButtons = document.querySelectorAll('.btn');
 const trendingGrid = document.getElementById('trendingGrid');
 
+// Cart Management System
+let cart = [];
+const CART_STORAGE_KEY = 'swiftcart_cart';
+
+// Load cart from localStorage on page load
+function loadCartFromStorage() {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    if (savedCart) {
+        cart = JSON.parse(savedCart);
+        updateCartCount();
+    }
+}
+
+// Save cart to localStorage
+function saveCartToStorage() {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+}
+
+// Add product to cart
+function addProductToCart(product) {
+    const existingItem = cart.find(item => item.id === product.id);
+    
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            image: product.image,
+            category: product.category,
+            quantity: 1
+        });
+    }
+    
+    saveCartToStorage();
+    updateCartCount();
+    showToast(`Added "${product.title}" to cart!`, 'success');
+}
+
+// Remove product from cart
+function removeFromCart(productId) {
+    const itemIndex = cart.findIndex(item => item.id === productId);
+    if (itemIndex > -1) {
+        const removedItem = cart[itemIndex];
+        cart.splice(itemIndex, 1);
+        saveCartToStorage();
+        updateCartCount();
+        showToast(`Removed "${removedItem.title}" from cart`, 'info');
+        
+        // Update cart display if cart modal is open
+        if (document.getElementById('cartModal')?.open) {
+            displayCartItems();
+        }
+    }
+}
+
+// Update quantity of item in cart
+function updateCartQuantity(productId, newQuantity) {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+        if (newQuantity <= 0) {
+            removeFromCart(productId);
+        } else {
+            item.quantity = newQuantity;
+            saveCartToStorage();
+            updateCartCount();
+            
+            // Update cart display if cart modal is open
+            if (document.getElementById('cartModal')?.open) {
+                displayCartItems();
+            }
+        }
+    }
+}
+
+// Update cart count in navbar
+function updateCartCount() {
+    const cartButton = document.querySelector('.btn-ghost.btn-circle');
+    const cartIcon = cartButton?.querySelector('i');
+    
+    if (cartButton && cartIcon) {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        
+        // Remove existing badge
+        const existingBadge = cartButton.querySelector('.badge');
+        if (existingBadge) {
+            existingBadge.remove();
+        }
+        
+        // Add cart count badge if there are items
+        if (totalItems > 0) {
+            const badge = document.createElement('div');
+            badge.className = 'badge badge-secondary badge-sm absolute -top-2 -right-2 min-w-5 h-5 text-xs';
+            badge.textContent = totalItems > 99 ? '99+' : totalItems.toString();
+            cartButton.style.position = 'relative';
+            cartButton.appendChild(badge);
+        }
+    }
+}
+
+// Calculate cart totals
+function calculateCartTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const tax = subtotal * 0.1; // 10% tax
+    const shipping = subtotal > 50 ? 0 : 5.99; // Free shipping over $50
+    const total = subtotal + tax + shipping;
+    
+    return {
+        subtotal: subtotal.toFixed(2),
+        tax: tax.toFixed(2),
+        shipping: shipping.toFixed(2),
+        total: total.toFixed(2)
+    };
+}
+
+// Create cart modal
+function createCartModal() {
+    if (document.getElementById('cartModal')) {
+        return;
+    }
+
+    const cartModalHTML = `
+        <dialog id="cartModal" class="modal">
+            <div class="modal-box max-w-4xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold">Shopping Cart</h3>
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+                    </form>
+                </div>
+                
+                <div id="cartContent">
+                    <!-- Cart items will be inserted here -->
+                </div>
+                
+                <div class="modal-action">
+                    <button id="clearCart" class="btn btn-outline btn-error mr-auto">
+                        <i class="fa-solid fa-trash mr-2"></i>
+                        Clear Cart
+                    </button>
+                    <form method="dialog">
+                        <button class="btn btn-outline">Continue Shopping</button>
+                    </form>
+                    <button id="checkout" class="btn btn-primary">
+                        <i class="fa-solid fa-credit-card mr-2"></i>
+                        Checkout
+                    </button>
+                </div>
+            </div>
+        </dialog>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', cartModalHTML);
+    
+    // Add event listeners
+    document.getElementById('clearCart').addEventListener('click', clearCart);
+    document.getElementById('checkout').addEventListener('click', handleCheckout);
+}
+
+// Display cart items in modal
+function displayCartItems() {
+    const cartContent = document.getElementById('cartContent');
+    
+    if (cart.length === 0) {
+        cartContent.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fa-solid fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                <p class="text-xl text-gray-500 mb-4">Your cart is empty</p>
+                <p class="text-gray-400">Add some products to get started!</p>
+            </div>
+        `;
+        return;
+    }
+
+    const totals = calculateCartTotals();
+    
+    cartContent.innerHTML = `
+        <div class="space-y-4 mb-6">
+            ${cart.map(item => `
+                <div class="flex items-center gap-4 p-4 border rounded-lg">
+                    <img src="${item.image}" alt="${item.title}" class="w-16 h-16 object-contain rounded">
+                    <div class="flex-1">
+                        <h4 class="font-semibold line-clamp-2">${item.title}</h4>
+                        <p class="text-sm text-gray-600">${formatCategoryName(item.category)}</p>
+                        <p class="font-bold text-primary">$${item.price}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateCartQuantity(${item.id}, ${item.quantity - 1})" 
+                                class="btn btn-sm btn-circle btn-outline">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <span class="w-12 text-center font-semibold">${item.quantity}</span>
+                        <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1})" 
+                                class="btn btn-sm btn-circle btn-outline">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold">$${(item.price * item.quantity).toFixed(2)}</p>
+                        <button onclick="removeFromCart(${item.id})" 
+                                class="btn btn-xs btn-error btn-outline mt-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        
+        <div class="border-t pt-4">
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between">
+                    <span>Subtotal:</span>
+                    <span>$${totals.subtotal}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Tax (10%):</span>
+                    <span>$${totals.tax}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Shipping:</span>
+                    <span>${totals.shipping === '0.00' ? 'FREE' : '$' + totals.shipping}</span>
+                </div>
+                <div class="flex justify-between text-xl font-bold border-t pt-2">
+                    <span>Total:</span>
+                    <span class="text-primary">$${totals.total}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Clear entire cart
+function clearCart() {
+    if (cart.length === 0) return;
+    
+    const confirmed = confirm('Are you sure you want to clear your cart?');
+    if (confirmed) {
+        cart = [];
+        saveCartToStorage();
+        updateCartCount();
+        displayCartItems();
+        showToast('Cart cleared successfully', 'info');
+    }
+}
+
+// Handle checkout
+function handleCheckout() {
+    if (cart.length === 0) {
+        showToast('Your cart is empty', 'error');
+        return;
+    }
+    
+    const totals = calculateCartTotals();
+    showToast(`Checkout total: $${totals.total}`, 'success');
+    
+    // Here you would typically redirect to a checkout page
+    // For now, just show a success message
+    setTimeout(() => {
+        showToast('Checkout functionality would be implemented here', 'info');
+    }, 1500);
+}
+
+// Show cart modal
+function showCart() {
+    createCartModal();
+    displayCartItems();
+    document.getElementById('cartModal').showModal();
+}
+
 // Fetch all products from the API
 async function fetchProducts() {
+    // Show skeleton loading
+    showProductSkeletons(8);
+    
     try {
         const response = await fetch(PRODUCTS_URL);
         if (!response.ok) throw new Error('Failed to fetch products');
@@ -23,7 +296,7 @@ async function fetchProducts() {
         displayProducts(products);
     } catch (error) {
         console.error('Error fetching products:', error);
-        showError('Failed to load products. Please try again later.');
+        showErrorWithRetry('Failed to load products. Please try again later.', 'fetchProducts');
     }
 }
 
@@ -41,6 +314,9 @@ async function fetchCategories() {
 
 // Fetch trending products (top 3 highest rated)
 async function fetchTrendingProducts() {
+    // Show skeleton loading
+    showTrendingSkeletons(3);
+    
     try {
         const response = await fetch(PRODUCTS_URL);
         if (!response.ok) throw new Error('Failed to fetch products');
@@ -57,7 +333,7 @@ async function fetchTrendingProducts() {
         displayTrendingProducts(trendingProducts);
     } catch (error) {
         console.error('Error fetching trending products:', error);
-        showTrendingError('Failed to load trending products. Please try again later.');
+        showErrorWithRetry('Failed to load trending products. Please try again later.', 'fetchTrendingProducts');
     }
 }
 
@@ -416,8 +692,8 @@ async function showProductDetails(productId, productData = null) {
 function addToCart(productId) {
     const product = currentProducts.find(p => p.id === productId);
     if (product) {
-        // Show toast notification
-        showToast(`Added "${product.title}" to cart!`, 'success');
+        // Add to cart using the cart management system
+        addProductToCart(product);
         
         // Close modal if it's open
         const modal = document.getElementById('productDetailsModal');
@@ -488,6 +764,72 @@ function showTrendingError(message) {
     }
 }
 
+// Create skeleton loader for products
+function createProductSkeleton() {
+    return `
+        <div class="card bg-base-200 shadow-md animate-pulse">
+            <figure class="bg-gray-300 p-6 h-64 flex items-center justify-center">
+                <div class="w-32 h-32 bg-gray-400 rounded"></div>
+            </figure>
+            <div class="card-body">
+                <div class="flex justify-between items-center text-sm mb-2">
+                    <div class="h-4 bg-gray-300 rounded w-20"></div>
+                    <div class="h-4 bg-gray-300 rounded w-16"></div>
+                </div>
+                <div class="h-6 bg-gray-300 rounded mb-2"></div>
+                <div class="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+                <div class="h-8 bg-gray-300 rounded w-20 mb-4"></div>
+                <div class="flex gap-3">
+                    <div class="h-8 bg-gray-300 rounded flex-1"></div>
+                    <div class="h-8 bg-gray-300 rounded flex-1"></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Show skeleton loading for products
+function showProductSkeletons(count = 8) {
+    if (productsGrid) {
+        const skeletons = Array(count).fill(null).map(() => createProductSkeleton()).join('');
+        productsGrid.innerHTML = skeletons;
+    }
+}
+
+// Show skeleton loading for trending products
+function showTrendingSkeletons(count = 3) {
+    if (trendingGrid) {
+        const skeletons = Array(count).fill(null).map(() => createProductSkeleton()).join('');
+        trendingGrid.innerHTML = skeletons;
+    }
+}
+
+// Enhanced error display with retry functionality
+function showErrorWithRetry(message, retryFunction) {
+    const errorHTML = `
+        <div class="col-span-full text-center py-12">
+            <div class="max-w-md mx-auto">
+                <i class="fa-solid fa-exclamation-triangle text-6xl text-red-400 mb-4"></i>
+                <div class="alert alert-error mb-4">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    <span>${message}</span>
+                </div>
+                <button onclick="${retryFunction}()" class="btn btn-primary">
+                    <i class="fa-solid fa-refresh mr-2"></i>
+                    Try Again
+                </button>
+            </div>
+        </div>
+    `;
+    
+    if (productsGrid) {
+        productsGrid.innerHTML = errorHTML;
+    }
+    if (trendingGrid) {
+        trendingGrid.innerHTML = errorHTML;
+    }
+}
+
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
     // Only run on products page
@@ -503,4 +845,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Create product details modal
     createProductDetailsModal();
+    
+    // Load cart from storage and setup cart button
+    loadCartFromStorage();
+    setupCartButton();
 });
+
+// Setup cart button click handler
+function setupCartButton() {
+    const cartButton = document.querySelector('.btn-ghost.btn-circle');
+    if (cartButton) {
+        cartButton.addEventListener('click', showCart);
+        cartButton.style.cursor = 'pointer';
+    }
+}
