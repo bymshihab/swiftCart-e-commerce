@@ -179,20 +179,78 @@ function showLoadingState() {
     }
 }
 
-// View product details (placeholder function)
+// View product details (using modal)
 function viewProductDetails(productId) {
     const product = currentProducts.find(p => p.id === productId);
     if (product) {
-        alert(`Product Details:\n\nTitle: ${product.title}\nPrice: $${product.price}\nDescription: ${product.description}`);
+        // Update modal content
+        document.getElementById('modalTitle').textContent = product.title;
+        document.getElementById('modalImage').src = product.image;
+        document.getElementById('modalImage').alt = product.title;
+        document.getElementById('modalCategory').textContent = formatCategoryName(product.category);
+        document.getElementById('modalPrice').textContent = `$${product.price}`;
+        document.getElementById('modalDescription').textContent = product.description;
+        
+        // Update rating
+        const rating = product.rating ? product.rating.rate : 0;
+        const ratingCount = product.rating ? product.rating.count : 0;
+        document.getElementById('modalRating').textContent = `${rating} (${ratingCount} reviews)`;
+        
+        // Update add to cart button
+        const addToCartBtn = document.getElementById('modalAddToCart');
+        addToCartBtn.onclick = () => addToCart(product.id);
+        
+        // Show modal
+        document.getElementById('productDetailsModal').showModal();
     }
 }
 
-// Add to cart (placeholder function)
+// Add to cart function
 function addToCart(productId) {
     const product = currentProducts.find(p => p.id === productId);
     if (product) {
-        alert(`Added "${product.title}" to cart!`);
+        // Show toast notification
+        showToast(`Added "${product.title}" to cart!`, 'success');
+        
+        // Close modal if it's open
+        const modal = document.getElementById('productDetailsModal');
+        if (modal && modal.open) {
+            modal.close();
+        }
     }
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+    // Remove existing toast
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-top toast-end z-50';
+    
+    const alertClass = type === 'success' ? 'alert-success' : 
+                     type === 'error' ? 'alert-error' : 'alert-info';
+    
+    toast.innerHTML = `
+        <div class="alert ${alertClass}">
+            <i class="fa-solid ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Add to body
+    document.body.appendChild(toast);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        if (toast && toast.parentNode) {
+            toast.remove();
+        }
+    }, 3000);
 }
 
 // Show error message
